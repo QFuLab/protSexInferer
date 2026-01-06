@@ -1,0 +1,2 @@
+The highest rAMLEY value for female is 0.010974206100767542
+The lowest rAMLEY value for male is 0.2678462120188591
