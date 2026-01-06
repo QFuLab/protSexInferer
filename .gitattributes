@@ -1,3 +1,3 @@
-script/* linguist-vendored
-database/* linguist-vendored
-example/* linguist-vendored
+script linguist-vendored
+database linguist-vendored
+example linguist-vendored
