@@ -73,7 +73,8 @@ def doPF(input_path, name):
 
 def doMQ(input_path,name):
 	pd.set_option('display.unicode.east_asian_width',True)
-	dff=pd.read_excel(input_path,usecols=['Sequence','Length','Modifications','Modified sequence','Leading razor protein','Raw file','Charge','m/z','Mass','Retention time','PEP','MS/MS count','MS/MS IDs','Score','Delta score','Intensity'])
+	dff=pd.read_table(input_path)
+	dff = dff[['Sequence','Length','Modifications','Modified sequence','Leading razor protein','Raw file','Charge','m/z','Mass','Retention time','PEP','MS/MS count','MS/MS IDs','Score','Delta score','Intensity']]
 	dff.columns=['Sequence','Length','PTM','Peptide','Accession','File','z','m/z','Mass','RT','-10LgP','#Spec','Scan','Score','Delta score','Intensity']
 	dff['GN']='0'
 	dff['Gene']=''
@@ -164,9 +165,7 @@ def main():
 		data.to_excel(name+".PEAKS.xlsx",index=False)
 		doPF(name+".PEAKS.xlsx", name)
 	elif type == "MaxQuant":
-		data = pd.read_csv(input_path, sep='\t')
-		data.to_excel(name+".PEAKS.xlsx",index=False)
-		doMQ(name+".PEAKS.xlsx", name)
+		doMQ(input_path, name)
 	elif type == "DIA-NN":
 		data = pd.read_parquet(input_path)
 		data.to_excel(name+".PEAKS.xlsx", index=False)
