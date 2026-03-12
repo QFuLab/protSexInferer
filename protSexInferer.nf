@@ -190,14 +190,14 @@ process plotrAMELY {
         val outDir
 
     output:
-        path "rAMELY_SexDeterminer.pdf"
+        path "rAMELY_Distribution.pdf"
         path "Sex_assessment_report.csv"
 
     script:
     """
     python3 ${workflow.projectDir}/script/plotrAMELY.py ${input_fn} ${femaleMaxrAMELY} ${maleMinrAMELY}
     
-    echo "All work completed! Please check the Sex_assessment_report.csv and rAMELY_SexDeterminer.pdf in the output directory." 
+    echo "All work completed! Please check the Sex_assessment_report.csv and rAMELY_Distribution.pdf in the output directory." 
     echo "The classified AMELY/AMELX-specifc peptides and the rAMELY_ratios for each individual are also saved in their corresponding folders."
     echo "Finished time: \$(date)" 
     """
@@ -227,8 +227,8 @@ workflow {
 
     //hello_message(params.inputFile)
     def currentDate = new java.util.Date()
-    println "Sex Determiner (3 Dec 2025)"
-    println "© 2025 Fan BAI, Zhongyou WU, and Qiaomei FU"
+    println "protSexInferer (6 Jan 2026)"
+    println "© 2026 Fan BAI, Zhongyou WU, and Qiaomei FU"
     println ""
     println "Options:"
     println "  --inputFile ${params.inputFile}"
