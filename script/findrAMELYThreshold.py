@@ -98,7 +98,7 @@ def rAMELYPlot(csv_file, female_max_rAMELY, male_min_rAMELY, output_plot=None, d
         ha='center', va='bottom', fontsize=12)
 
     # Customize plot
-    ax.set_xlabel('rAMELY', fontsize=12, fontweight='bold')
+    ax.set_xlabel(r'$R_{AMELY}$', fontsize=12, fontweight='bold')
     ax.set_yticks(range(len(df)))
     ax.set_yticklabels(df['Individual'])
     
