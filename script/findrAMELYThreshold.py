@@ -23,10 +23,9 @@ def process_files(gender_file, stats_file):
     male_stats = stats_df[stats_df['Sex'] == 'M']
     female_stats = stats_df[stats_df['Sex'] == 'F']
 
-    male_min_index = male_stats['Mean'].idxmin()
-    male_min_rAMELY = male_stats['Mean'][male_min_index] - (male_stats['Mean'][male_min_index] - male_stats['CI95_bottom'][male_min_index]) / 1.96 * 3
-    female_max_index = female_stats['Mean'].idxmax()
-    female_max_rAMELY = female_stats['Mean'][female_max_index] + (female_stats['CI95_up'][female_max_index] - female_stats['Mean'][female_max_index]) / 1.96 * 3
+    male_min_rAMELY = male_stats['Mean'].min()
+    female_max_rAMELY = female_stats['Mean'].max()
+    lowest_unique_peptides_num = stats_df['unqiue_AMELYX_peptides'].min()
 
     stats_df.to_csv(stats_file, index=False)
     
@@ -36,6 +35,8 @@ def process_files(gender_file, stats_file):
         if female_max_rAMELY >= male_min_rAMELY:  
             f.write("!! WORNING: The maximum rAMELY value for female is greater than or equal to the minimum rAMELY value!")
             f.write("!! Please check the input data and re-evaluate the threshold!\n")
+        f.write(f"The lowest unique AMELYX peptide number is {lowest_unique_peptides_num}\n")
+    print(f"rAMELY threshold saved to: rAMELY_threshold.txt")
 
     return female_max_rAMELY, male_min_rAMELY
 
@@ -51,7 +52,7 @@ def rAMELYPlot(csv_file, female_max_rAMELY, male_min_rAMELY, output_plot=None, d
     df = pd.read_csv(csv_file)
 
     # Check required columns
-    required_columns = ['Individual', 'Mean', 'CI95_bottom', 'CI95_up', 'Sex']
+    required_columns = ['Individual', 'Mean', 'Sex', 'unqiue_AMELYX_peptides', 'total_amelogenin_peptides']
     missing_columns = [col for col in required_columns if col not in df.columns]
     if missing_columns:
         raise ValueError(f"Missing required columns: {missing_columns}")
@@ -73,7 +74,6 @@ def rAMELYPlot(csv_file, female_max_rAMELY, male_min_rAMELY, output_plot=None, d
         ax.errorbar(
             x=row['Mean'],
             y=i,
-            xerr=[[row['Mean'] - row['CI95_bottom']], [row['CI95_up'] - row['Mean']]],
             fmt='o',
             color=color_map[row['Sex']],
             markersize=8,
@@ -81,6 +81,12 @@ def rAMELYPlot(csv_file, female_max_rAMELY, male_min_rAMELY, output_plot=None, d
             label=row['Sex'] if row['Sex'] not in df.iloc[:i]['Sex'].values else ""
         )
     
+    # Show unique peptides number in right axis
+    secax = ax.secondary_yaxis('right')
+    y_labels = [f"n={int(row['unqiue_AMELYX_peptides'])}" for _, row in df.iterrows()]
+    secax.set_yticks(range(len(df)))
+    secax.set_yticklabels(y_labels)   
+
     # Add vertical dashed lines
     ax.axvline(x=female_max_rAMELY, color=color_map['F'], linestyle='--', alpha=0.7, linewidth=1.5)
     ax.axvline(x=male_min_rAMELY, color=color_map['M'], linestyle='--', alpha=0.7, linewidth=1.5)
@@ -128,4 +134,4 @@ if __name__ == "__main__":
     
     female_max_rAMELY, male_min_rAMELY = process_files(gender_file, stats_file)
 
-    rAMELYPlot(stats_file, female_max_rAMELY, male_min_rAMELY, 'rAMELY_distribution.pdf')
+    rAMELYPlot(stats_file, female_max_rAMELY, male_min_rAMELY, 'rAMELY_Distribution.pdf')

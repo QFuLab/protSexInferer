@@ -8,24 +8,27 @@ def rAMELY_computer(ind_name, df_fn):
     print(f"Calculate the rAMELY ratio for {ind_name}")
     summary_df = df.groupby('Individual').agg(
         AMELY_unique_peptides=('Classification', lambda x: (x == 'AMELY-unique').sum()),
-        AMELX_unique_peptides=('Classification', lambda x: (x == 'AMELX-unique').sum())
+        AMELX_unique_peptides=('Classification', lambda x: (x == 'AMELX-unique').sum()),
+        Both=('Classification', lambda x: (x == 'Both').sum()),
     )
-    total_peptides = (
+    unique_peptides = (
         summary_df['AMELX_unique_peptides'].item() + 
         summary_df['AMELY_unique_peptides'].item()
     )
-    if total_peptides > 0:
-        summary_df['Mean'] = summary_df['AMELY_unique_peptides'] / total_peptides
-        std_error = (summary_df['Mean'] * (1 - summary_df['Mean'])) / total_peptides
-        summary_df['CI95_bottom'] = summary_df['Mean'] - 1.96 * std_error
-        summary_df['CI95_up'] = summary_df['Mean'] + 1.96 * std_error
+    total_peptides = (
+        summary_df['AMELX_unique_peptides'].item() + 
+        summary_df['AMELY_unique_peptides'].item() +
+        summary_df['Both'].item()        
+    )
+    if summary_df['AMELY_unique_peptides'].item() > 0:
+        summary_df['Mean'] = summary_df['AMELY_unique_peptides'] / unique_peptides
     else:
         summary_df['Mean'] = 0
-        summary_df['CI95_bottom'] = 0
-        summary_df['CI95_up'] = 0
+    summary_df['unqiue_AMELYX_peptides'] = unique_peptides
+    summary_df['total_amelogenin_peptides'] = total_peptides
     
     summary_df = summary_df.reset_index()
-    res_df = summary_df[['Individual', 'Mean', 'CI95_bottom', 'CI95_up']]
+    res_df = summary_df[['Individual', 'Mean', 'unqiue_AMELYX_peptides', 'total_amelogenin_peptides']]
     res_df.to_csv(f'{ind_name}-rAMELY_summary_statistics.csv', index=False)        
     print(f"Results saved to: {ind_name}-rAMELY_summary_statistics.csv")
     

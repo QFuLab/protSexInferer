@@ -6,6 +6,7 @@ params.withoutBLASTdb = false
 params.findrAMELYThreshold = false
 params.femaleMaxrAMELY = null
 params.maleMinrAMELY = null
+params.minimumUniquePeptidesNum = null
 
 params.BLASTdbPath = "${workflow.projectDir}/BLAST_Database"
 params.databaseSearchingSoftware = "PEAKS"
@@ -168,7 +169,7 @@ process findThreshold {
         val outDir
     output:
         path "rAMELY_threshold.txt"
-        path "rAMELY_distribution.pdf"
+        path "rAMELY_Distribution.pdf"
 
     script:
     """
@@ -187,17 +188,18 @@ process plotrAMELY {
         val input_fn
         val femaleMaxrAMELY
         val maleMinrAMELY
+        val minimumUniquePeptidesNum
         val outDir
 
     output:
-        path "rAMELY_Distribution.pdf"
+        path "rAMELY_SexDeterminer.pdf"
         path "Sex_assessment_report.csv"
 
     script:
     """
-    python3 ${workflow.projectDir}/script/plotrAMELY.py ${input_fn} ${femaleMaxrAMELY} ${maleMinrAMELY}
+    python3 ${workflow.projectDir}/script/plotrAMELY.py ${input_fn} ${femaleMaxrAMELY} ${maleMinrAMELY} ${minimumUniquePeptidesNum}
     
-    echo "All work completed! Please check the Sex_assessment_report.csv and rAMELY_Distribution.pdf in the output directory." 
+    echo "All work completed! Please check the Sex_assessment_report.csv and rAMELY_SexDeterminer.pdf in the output directory." 
     echo "The classified AMELY/AMELX-specifc peptides and the rAMELY_ratios for each individual are also saved in their corresponding folders."
     echo "Finished time: \$(date)" 
     """
@@ -205,14 +207,15 @@ process plotrAMELY {
 
 workflow {
     // Validate required parameters
-    assert params.inputFile != null &&  params.outDir != null:
-        "Error: You must provide input file (--inputFile) and output directory path (--outDir)!"
+    assert params.inputFile != null && params.outDir != null && params.RefDatabase != null:
+        "Error: You must provide input file (--inputFile), output directory path (--outDir) and protein reference database (--RefDatabase)!"
     assert params.databaseSearchingSoftware in ["PEAKS", "MaxQuant", "DIA-NN", "pFind"] :  
         "Error: The value of params.databaseSearchingSoftware should be one of 'PEAKS', 'pFind', 'MaxQuant', or 'DIA-NN'"
 
     // Set default thresholds if not provided
-    def femaleMaxrAMELYDefault = ["PEAKS": 0.05525587, "MaxQuant": 0.01608375, "DIA-NN": 0.07319711, "pFind": 0.03290402]
-    def maleMinrAMELYDefault = ["PEAKS": 0.08809166, "MaxQuant": 0.03103858, "DIA-NN": 0.08635405, "pFind": 0.05770555]
+    def femaleMaxrAMELYDefault = ["PEAKS": 0.0526315789473684, "MaxQuant": 0.015384615, "DIA-NN": 0.0723404255319148, "pFind": 0.032520325203252]
+    def maleMinrAMELYDefault = ["PEAKS": 0.0909090909090909, "MaxQuant": 0.0344827586206896, "DIA-NN": 0.0884955752212389, "pFind": 0.0612244897959183]
+    def minimumUniquePeptidesNumDefault = ["PEAKS": 7, "MaxQuant": 6, "DIA-NN": 33, "pFind": 29]
 
     if (params.femaleMaxrAMELY == null) {
         UserfemaleMaxrAMELY = femaleMaxrAMELYDefault[params.databaseSearchingSoftware]
@@ -223,6 +226,11 @@ workflow {
         UsermaleMinrAMELY = maleMinrAMELYDefault[params.databaseSearchingSoftware]
     } else {
         UsermaleMinrAMELY = params.maleMinrAMELY
+    }
+    if (params.minimumUniquePeptidesNum == null) {
+        UserMinimumUniquePeptidesNum = minimumUniquePeptidesNumDefault[params.databaseSearchingSoftware]
+    } else {
+        UserMinimumUniquePeptidesNum = params.minimumUniquePeptidesNum
     }
 
     //hello_message(params.inputFile)
@@ -237,6 +245,7 @@ workflow {
     println "  --findrAMELYThreshold ${params.findrAMELYThreshold}"
     println "  --femaleMaxrAMELY ${UserfemaleMaxrAMELY}"
     println "  --maleMinrAMELY ${UsermaleMinrAMELY}"
+    println "  --minimumUniquePeptidesNum ${UserMinimumUniquePeptidesNum}"
     println "  --autoBLAST ${params.autoBLAST}"
     println "  --withoutBLASTdb ${params.withoutBLASTdb}"
     println "  --minimumBLASTLength ${params.minimumBLASTLength}"
@@ -290,6 +299,6 @@ workflow {
         findThreshold(channel.fromPath(params.inputFile), concatDf.out.rAMELY_out, params.outDir)
     } else {
         // Plot the rAMELY distribution with user-defined thresholds
-        plotrAMELY(concatDf.out.rAMELY_out, UserfemaleMaxrAMELY, UsermaleMinrAMELY, params.outDir)
+        plotrAMELY(concatDf.out.rAMELY_out, UserfemaleMaxrAMELY, UsermaleMinrAMELY, UserMinimumUniquePeptidesNum, params.outDir)
     }
 }
