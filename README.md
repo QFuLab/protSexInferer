@@ -6,7 +6,8 @@ protSexInferer is a lightweight, open-source Nextflow pipeline designed for accu
 
 ## Citation
 
-Fan Bai, Zhongyou Wu, Song Xing, Qiaomei Fu, protSexInferer: an effective and robust pipeline for paleo-proteomic sex determination (Under Review)
+Fan Bai, Zhongyou Wu, Song Xing, Qiaomei Fu, Rapid and robust sex determination from ancient enamel proteomes using protSexInferer, _Journal of Genetics and Genomics_, 2026, ISSN 1673-8527, https://doi.org/10.1016/j.jgg.2026.04.012. 
+(https://www.sciencedirect.com/science/article/pii/S167385272600144X)
 
 ## Key Features
 
