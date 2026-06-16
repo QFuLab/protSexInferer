@@ -34,7 +34,7 @@ def rAMELY_computer(ind_name, df_fn):
     
 if __name__ == "__main__":    
     parser = argparse.ArgumentParser(
-        description="Calculate the rAMELY ratio and confident interval",
+        description="Calculate the rAMELY ratio",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
     parser.add_argument("ind_name", help="The name of sample")

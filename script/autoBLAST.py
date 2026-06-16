@@ -100,8 +100,8 @@ def autoBLAST(ind_name: str, peptides: List[str]) -> List[Tuple[str, List]]:
 
 def not_Amelogenin(hit_def: str) -> bool:
     hit_def = hit_def.lower()
-    return (hit_def.find('hypothetical') != -1 and hit_def.find('predicted') != -1 and 
-            hit_def.find('amelogenin') != -1 and hit_def.find('amely') != -1 and hit_def.find('amelx') != -1)
+    return (hit_def.find('hypothetical') == -1 and hit_def.find('predicted') == -1 and 
+            hit_def.find('amelogenin') == -1 and hit_def.find('amely') == -1 and hit_def.find('amelx') == -1)
 
 def get_peptides_to_remove(ind_name: str, results: List[Tuple[str, List]]) -> List:
     peptides_to_remove = []

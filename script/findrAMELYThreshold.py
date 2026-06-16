@@ -123,7 +123,7 @@ def rAMELYPlot(csv_file, female_max_rAMELY, male_min_rAMELY, output_plot=None, d
 if __name__ == "__main__":
     
     parser = argparse.ArgumentParser(
-        description='Process gender and rAMELY statistics files to calculate minimum lower bound of 95% CI for male individuals'
+        description='Process gender and rAMELY statistics files to calculate the threshold for distinguishing male and female individuals'
     )
     parser.add_argument('gender_file', type=str, help='Path to CSV file with gender information (first row: individual names, second row: path of raw data, third row: genders)')
     parser.add_argument('stats_file', type=str, help='Path to CSV file with rAMELY statistics')

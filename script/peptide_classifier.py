@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Classify the peptides to `AMELY-unique`, `AMELX-unique`, or `Both` (means it matchs both AMELY and AMELX) categories
+Classify the peptides into `AMELY-unique`, `AMELX-unique`, or `Both` (means it matchs both AMELY and AMELX) categories
 """
 
 import pandas as pd
@@ -96,20 +96,6 @@ def classify_peptides(df: pd.DataFrame, AMELX_seqlist: list, AMELY_seqlist: list
     Classify peptides into AMELX-unique, AMELY-unique, or both (means it matchs both AMELY and AMELX) categories.
     Returns filtered DataFrame and weighted statistics.
     """
-    # Get Spec and Intensity columns (adjust if multiple exist)
-    if '#Spec' in df.columns:
-        spec_cols = ['#Spec']
-    else:
-        spec_cols = [col for col in df.columns if col.startswith('#Spec ')]
-    if 'Intensity' in df.columns:
-        intensity_cols = ['Intensity']
-    else:
-        intensity_cols = [col for col in df.columns if col.startswith('Intensity ')]
-    if 'Area' in df.columns:
-        area_cols = ['Area']
-    else:
-        area_cols = [col for col in df.columns if col.startswith('Area ')]
-
     classified_rows = []
     
     for peptide, group in df.groupby('Peptide'):
@@ -137,24 +123,6 @@ def classify_peptides(df: pd.DataFrame, AMELX_seqlist: list, AMELY_seqlist: list
         row = row[existing_columns]
         row['Classification'] = classification
         
-        if spec_cols:
-            spec_sum = 0
-            for spec_col in spec_cols:
-                unique_values = group[spec_col].dropna().unique()
-                spec_sum += unique_values.sum()
-            row['#Spec'] = spec_sum
-        if intensity_cols:
-            intensity_sum = 0
-            for intensity_col in intensity_cols:
-                unique_values = group[intensity_col].replace({np.nan: 0}).dropna().unique()
-                intensity_sum += unique_values.sum()
-            row['Intensity'] = intensity_sum
-        if area_cols:
-            area_sum = 0
-            for area_col in area_cols:
-                unique_values = group[area_col].replace({np.nan: 0}).dropna().unique()
-                area_sum += unique_values.sum()
-            row['Area'] = area_sum
         # Add to classified results
         classified_rows.append(row)
 
